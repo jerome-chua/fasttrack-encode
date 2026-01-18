@@ -59,7 +59,7 @@ bot.hears("❓ Ask Questions", async (ctx) => {
 // Handle other text messages
 bot.on("message:text", async (ctx) => {
   await ctx.reply(
-    `You said: ${ctx.message.text}\n\nUse the menu buttons below to navigate.`,
+    `Type /start to explore FastTrack!`,
     { reply_markup: menuKeyboard }
   );
 });

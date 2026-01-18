@@ -1,3 +1,5 @@
+import WeightChart from "@/components/WeightChart";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-fasttrack-white">
@@ -111,8 +113,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Weight Progress Chart Section */}
+      <section className="p-6 md:py-20">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-4 text-center text-3xl font-bold uppercase tracking-wide text-fasttrack-ocean md:text-4xl">
+            Track Your Progress
+          </h2>
+          <p className="mx-auto mb-8 max-w-2xl text-center text-lg text-fasttrack-ocean/70">
+            Monitor your weight journey with our interactive chart. Focus on the trend, not daily fluctuations.
+          </p>
+          <WeightChart />
+        </div>
+      </section>
+
       {/* How It Works Section */}
-      <section id="features" className="px-8 py-20 md:py-28">
+      <section id="features" className="p-6">
         <div className="mx-auto max-w-6xl">
           <h2 className="mb-4 text-center text-3xl font-bold uppercase tracking-wide text-fasttrack-ocean md:text-4xl">
             How It Works
