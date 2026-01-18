@@ -12,7 +12,7 @@ export default function Home() {
             Features
           </a>
           <a
-            href="#about"
+            href="/about"
             className="text-fasttrack-ocean transition-colors hover:text-fasttrack-azure"
           >
             About
@@ -106,6 +106,105 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="features" className="px-8 py-20 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-4 text-center text-3xl font-bold uppercase tracking-wide text-fasttrack-ocean md:text-4xl">
+            How It Works
+          </h2>
+          <p className="mx-auto mb-12 max-w-2xl text-center text-lg text-fasttrack-ocean/70">
+            FastTrack uses a Telegram bot to make tracking your health journey
+            simple and seamless.
+          </p>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {/* Feature 1 - Photo Tracking */}
+            <div className="rounded-2xl bg-fasttrack-mist p-8 text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-fasttrack-azure/20">
+                <svg
+                  className="h-8 w-8 text-fasttrack-azure"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-3 text-xl font-semibold text-fasttrack-ocean">
+                Snap Your Meals
+              </h3>
+              <p className="text-fasttrack-ocean/70">
+                Take a photo of your food and our AI will automatically estimate
+                and record the calories for you.
+              </p>
+            </div>
+
+            {/* Feature 2 - Fasting Tracker */}
+            <div className="rounded-2xl bg-fasttrack-mist p-8 text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-fasttrack-azure/20">
+                <svg
+                  className="h-8 w-8 text-fasttrack-azure"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-3 text-xl font-semibold text-fasttrack-ocean">
+                Track Fasting Periods
+              </h3>
+              <p className="text-fasttrack-ocean/70">
+                Get prompted to update your fasting windows and stay on track
+                with intermittent fasting schedules.
+              </p>
+            </div>
+
+            {/* Feature 3 - Insights */}
+            <div className="rounded-2xl bg-fasttrack-mist p-8 text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-fasttrack-azure/20">
+                <svg
+                  className="h-8 w-8 text-fasttrack-azure"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-3 text-xl font-semibold text-fasttrack-ocean">
+                Personalized Insights
+              </h3>
+              <p className="text-fasttrack-ocean/70">
+                Receive tailored insights and recommendations based on your
+                weight loss goals and progress.
+              </p>
             </div>
           </div>
         </div>

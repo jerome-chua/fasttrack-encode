@@ -10,8 +10,9 @@ export const bot = new Bot(token);
 
 // Handle /start command
 bot.command("start", async (ctx) => {
+  const firstName = ctx.from?.first_name ?? "there";
   await ctx.reply(
-    "Hi there! Welcome to FastTrack, where we'll hit your weight goals together using principles from The Obesity Code by Dr. Jason Fung."
+    `Hi ${firstName}! Welcome to FastTrack, where we'll hit your weight goals together using principles from The Obesity Code by Dr. Jason Fung.`
   );
 });
 
