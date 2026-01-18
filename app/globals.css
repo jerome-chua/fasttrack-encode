@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/*
+ * FastTrack Color Palette
+ * -----------------------
+ * mist:    #cadeef - Lightest blue, backgrounds
+ * white:   #ffffff - Pure white
+ * sky:     #9bd4e4 - Light accent
+ * azure:   #39ace7 - Primary brand color
+ * ocean:   #0784b5 - Dark accent, CTAs
+ */
+
+:root {
+  --background: #ffffff;
+  --foreground: #0784b5;
+
+  /* FastTrack Brand Colors */
+  --fasttrack-mist: #cadeef;
+  --fasttrack-white: #ffffff;
+  --fasttrack-sky: #9bd4e4;
+  --fasttrack-azure: #39ace7;
+  --fasttrack-ocean: #0784b5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* FastTrack Colors */
+  --color-fasttrack-mist: var(--fasttrack-mist);
+  --color-fasttrack-white: var(--fasttrack-white);
+  --color-fasttrack-sky: var(--fasttrack-sky);
+  --color-fasttrack-azure: var(--fasttrack-azure);
+  --color-fasttrack-ocean: var(--fasttrack-ocean);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
