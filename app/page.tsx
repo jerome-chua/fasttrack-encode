@@ -17,9 +17,14 @@ export default function Home() {
           >
             About
           </a>
-          <button className="rounded-lg bg-fasttrack-ocean px-4 py-2 font-medium text-white transition-colors hover:bg-fasttrack-azure">
+          <a
+            href="https://t.me/FastTrackOcBot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg bg-fasttrack-ocean px-4 py-2 font-medium text-white transition-colors hover:bg-fasttrack-azure"
+          >
             Get Started
-          </button>
+          </a>
         </div>
       </nav>
 
@@ -115,9 +120,14 @@ export default function Home() {
           <p className="mb-8 text-lg text-fasttrack-ocean/70">
             Join thousands of users who are unlocking their potential every day.
           </p>
-          <button className="rounded-lg bg-fasttrack-ocean px-8 py-4 text-lg font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fasttrack-azure">
+          <a
+            href="https://t.me/FastTrackOcBot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block rounded-lg bg-fasttrack-ocean px-8 py-4 text-lg font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fasttrack-azure"
+          >
             Unlock Yours
-          </button>
+          </a>
         </div>
       </section>
 
