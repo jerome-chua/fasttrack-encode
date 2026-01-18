@@ -225,7 +225,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="inline-block rounded-lg bg-fasttrack-ocean px-8 py-4 text-lg font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fasttrack-azure"
           >
-            Unlock Yours
+            BEGIN
           </a>
         </div>
       </section>
