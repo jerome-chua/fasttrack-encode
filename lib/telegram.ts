@@ -9,8 +9,10 @@ import {
   startFast,
   endFast,
   User,
+  supabase,
 } from "./supabase";
 import { foodAnalyzerAgent } from "./agents/food-analyzer";
+import crypto from "crypto";
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -35,6 +37,96 @@ function formatFastDuration(startedAt: string): string {
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
   return `${hours}h ${minutes}m`;
+}
+
+// Check if text looks like a login code (8 alphanumeric characters)
+function isLoginCode(text: string): boolean {
+  return /^[A-Z0-9]{8}$/i.test(text);
+}
+
+// Verify and process login code
+async function verifyLoginCode(
+  code: string,
+  telegramId: number,
+  firstName: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Find the login code
+    const { data: loginCode, error: findError } = await supabase
+      .from("login_codes")
+      .select("*")
+      .eq("code", code.toUpperCase())
+      .eq("status", "pending")
+      .single();
+
+    if (findError || !loginCode) {
+      return { success: false, error: "Invalid or expired code" };
+    }
+
+    // Check if expired
+    if (new Date(loginCode.expires_at) < new Date()) {
+      await supabase
+        .from("login_codes")
+        .update({ status: "expired" })
+        .eq("id", loginCode.id);
+      return { success: false, error: "Code has expired" };
+    }
+
+    // Check attempts (max 3)
+    if (loginCode.attempts >= 3) {
+      await supabase
+        .from("login_codes")
+        .update({ status: "expired" })
+        .eq("id", loginCode.id);
+      return { success: false, error: "Too many attempts" };
+    }
+
+    // Ensure user exists
+    let user = await getUser(telegramId);
+    if (!user) {
+      user = await createUser(telegramId, firstName);
+    }
+
+    if (!user) {
+      return { success: false, error: "Failed to create user" };
+    }
+
+    // Generate session token
+    const sessionToken = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    // Create session
+    const { error: sessionError } = await supabase.from("sessions").insert({
+      telegram_id: telegramId,
+      token: sessionToken,
+      expires_at: expiresAt.toISOString(),
+    });
+
+    if (sessionError) {
+      console.error("Error creating session:", sessionError);
+      return { success: false, error: "Failed to create session" };
+    }
+
+    // Update login code as verified
+    const { error: updateError } = await supabase
+      .from("login_codes")
+      .update({
+        telegram_id: telegramId,
+        session_token: sessionToken,
+        status: "verified",
+      })
+      .eq("id", loginCode.id);
+
+    if (updateError) {
+      console.error("Error updating login code:", updateError);
+      return { success: false, error: "Failed to verify code" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Login code verification error:", error);
+    return { success: false, error: "Verification failed" };
+  }
 }
 
 // Handle /start command
@@ -260,12 +352,30 @@ bot.on("message:photo", async (ctx) => {
   }
 });
 
-// Handle other text messages (onboarding flow)
+// Handle other text messages (onboarding flow + login codes)
 bot.on("message:text", async (ctx) => {
   const telegramId = ctx.from?.id;
+  const firstName = ctx.from?.first_name ?? "there";
   const text = ctx.message.text.trim();
 
   if (!telegramId) return;
+
+  // Check if this is a login code (8 alphanumeric characters)
+  if (isLoginCode(text)) {
+    const result = await verifyLoginCode(text, telegramId, firstName);
+
+    if (result.success) {
+      await ctx.reply(
+        "✅ Login successful!\n\nYou can now access the FastTrack dashboard in your browser.",
+        { reply_markup: menuKeyboard }
+      );
+    } else {
+      await ctx.reply(
+        `❌ ${result.error || "Invalid code"}.\n\nPlease check the code and try again, or request a new one from the login page.`
+      );
+    }
+    return;
+  }
 
   const user = await getUser(telegramId);
 
