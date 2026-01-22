@@ -12,12 +12,28 @@ A Telegram bot for fasting and nutrition tracking, built with Next.js and Supaba
 
 Create a `.env.local` and fill in:
 
-```
+```bash
+# Supabase (from Supabase Dashboard → Project Settings → API)
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your-supabase-publishable-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+
+# Telegram (from @BotFather)
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+NEXT_PUBLIC_TELEGRAM_BOT_NAME=YourBotName  # without @
+
+# Google AI
 GEMINI_API_KEY=your-gemini-key
 ```
+
+| Variable | Description | Where to find |
+|----------|-------------|---------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Supabase → Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | Public/anon key (safe for client) | Supabase → Settings → API → `anon` `public` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Secret key (server-side only) | Supabase → Settings → API → `service_role` |
+| `TELEGRAM_BOT_TOKEN` | Bot authentication token | @BotFather → /mybots → API Token |
+| `NEXT_PUBLIC_TELEGRAM_BOT_NAME` | Bot username for login widget | Your bot's username (without @) |
+| `GEMINI_API_KEY` | Google AI API key | Google AI Studio |
 
 ## Database Setup
 
