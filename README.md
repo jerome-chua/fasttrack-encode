@@ -40,7 +40,7 @@ GEMINI_API_KEY=your-gemini-key
 ### Option 1: Remote Supabase (Recommended for production)
 
 ```bash
-# Link to existing project
+# Link to existing project (find ref in Supabase → Settings → General)
 supabase link --project-ref <your-project-ref>
 
 # Push migrations to remote database
@@ -57,6 +57,37 @@ supabase start
 supabase db reset
 ```
 
+### Supabase CLI Commands Reference
+
+```bash
+# Check Supabase CLI version
+supabase --version
+
+# Login to Supabase
+supabase login
+
+# Link project (required before push)
+supabase link --project-ref <project-ref>
+
+# Push migrations to remote
+supabase db push
+
+# Reset local database (reruns all migrations)
+supabase db reset
+
+# Create a new migration
+supabase migration new <migration-name>
+
+# Check migration status
+supabase migration list
+
+# Pull remote schema changes
+supabase db pull
+
+# Generate TypeScript types from schema
+supabase gen types typescript --linked > lib/database.types.ts
+```
+
 ## Running the App
 
 ```bash
@@ -68,11 +99,23 @@ Open [http://localhost:3000](http://localhost:3000) to see the web app.
 
 ## Database Schema
 
-Tables:
-- `users` - User profiles and onboarding state
-- `weight_logs` - Daily weight tracking
-- `fasting_periods` - Fasting start/end times
-- `food_logs` - Meals with nutrition data
-- `daily_summaries` - AI-generated daily insights
+| Table | Description |
+|-------|-------------|
+| `users` | User profiles and onboarding state |
+| `weight_logs` | Daily weight tracking |
+| `fasting_periods` | Fasting start/end times |
+| `food_logs` | Meals with nutrition data |
+| `daily_summaries` | AI-generated daily insights |
+| `sessions` | Web authentication sessions (Telegram Login) |
 
 Migrations are in `supabase/migrations/`.
+
+## Telegram Bot Setup
+
+1. Create a bot with [@BotFather](https://t.me/BotFather)
+2. Get the bot token and add to `.env.local`
+3. For Telegram Login Widget, set your domain:
+   ```
+   /setdomain
+   ```
+   Then enter your domain (e.g., `localhost` for dev or `your-app.vercel.app` for production)
