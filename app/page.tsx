@@ -20,6 +20,12 @@ export default function Home() {
             About
           </a>
           <a
+            href="/login"
+            className="text-fasttrack-ocean transition-colors hover:text-fasttrack-azure"
+          >
+            Login
+          </a>
+          <a
             href="https://t.me/FastTrackOcBot"
             target="_blank"
             rel="noopener noreferrer"
