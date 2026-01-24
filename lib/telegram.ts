@@ -331,8 +331,11 @@ bot.on("message:photo", async (ctx) => {
       newMessage,
     })) {
       console.log("📨 Event received:", event.author, event.content?.parts?.length, "parts");
-      // Extract text from model responses
-      if (event.content?.parts) {
+      // Only capture text from the agent's final response (after tool execution)
+      // Skip tool calls and intermediate responses
+      if (event.author === "food_analyzer_agent" && event.content?.parts) {
+        // Clear previous response to only keep the latest (final) agent response
+        agentResponse = "";
         for (const part of event.content.parts) {
           if ("text" in part && part.text) {
             agentResponse += part.text;
