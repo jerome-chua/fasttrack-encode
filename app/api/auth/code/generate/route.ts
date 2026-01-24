@@ -61,7 +61,7 @@ export async function POST() {
     }
 
     // Set expiration to 5 minutes from now
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
+    const expiresAt = new Date(Date.now() + 1 * 60 * 1000)
 
     // Create login code record
     const { data, error } = await db
