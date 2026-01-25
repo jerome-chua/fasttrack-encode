@@ -1,6 +1,6 @@
 import { Context } from "grammy";
 import { getUser, updateUser, logWeight, User } from "../supabase";
-import { menuKeyboard } from "../constants/keyboards";
+import { menuButtons } from "../constants/keyboards";
 import { START_MESSAGES, ONBOARDING_MESSAGES, TEXT_MESSAGES } from "../constants/messages";
 import { isLoginCode, validateNumber, validateWeight, validateHeight } from "../utils/validation";
 import { handleLoginCode } from "./login";
@@ -38,7 +38,7 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
     if (user.onboarding_step === "completed") {
       await ctx.reply(
         TEXT_MESSAGES.GENERAL_RESPONSE,
-        { reply_markup: menuKeyboard }
+        { reply_markup: menuButtons }
       );
       return;
     }
@@ -114,7 +114,7 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
                 updatedUser.goal_weight!
               );
 
-          await ctx.reply(message, { reply_markup: menuKeyboard });
+          await ctx.reply(message, { reply_markup: menuButtons });
         }
         break;
       }

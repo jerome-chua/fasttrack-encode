@@ -1,6 +1,6 @@
 import { Context } from "grammy";
 import { Keyboard } from "grammy";
-import { menuKeyboard } from "../constants/keyboards";
+import { menuButtons } from "../constants/keyboards";
 
 // Handle errors and send user-friendly messages
 export async function handleError(
@@ -18,7 +18,7 @@ export async function handleError(
 
   await ctx.reply(
     `Sorry, something went wrong: ${errorMessage}`,
-    { reply_markup: menuKeyboard }
+    { reply_markup: menuButtons }
   );
 }
 
@@ -48,6 +48,6 @@ export async function handleErrorWithKeyboard(
 
   await ctx.reply(
     `Sorry, something went wrong: ${errorMessage}`,
-    { reply_markup: keyboard || menuKeyboard }
+    { reply_markup: keyboard || menuButtons }
   );
 }

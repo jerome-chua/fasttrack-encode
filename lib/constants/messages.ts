@@ -23,17 +23,17 @@ export const START_MESSAGES = {
 // Menu button messages
 export const MENU_MESSAGES = {
   FOOD_LOG: "📸 Send me a photo of your meal and I'll estimate the calories for you!",
+  DAILY_SUMMARY: "☀️ Here's your daily summary - coming soon!\n\nThis feature will show your nutrition totals and fasting progress for today.",
   GET_INSIGHTS: "📊 Here are your insights based on your weight loss goals:\n\n• Keep tracking your meals consistently\n• Aim for 16-hour fasting windows\n• Stay hydrated during fasting periods",
-  ASK_QUESTIONS: "❓ Ask me anything about intermittent fasting, nutrition, or your weight loss journey!",
+  ASK_QUESTIONS: "💬 Ask me anything about intermittent fasting, nutrition, or your weight loss journey!",
 } as const;
 
-// Fasting messages
-export const FASTING_MESSAGES = {
-  FAST_ENDED: (duration: string) =>
-    `⏰ Fast ended!\n\nYou fasted for ${duration}. Great job!\n\n📸 Want to log your first meal? Send me a photo!`,
-  FAST_STARTED: `🕐 Fast started!\n\nI've recorded the start time. Tap "⏰ Break Fast" again when you're ready to eat.\n\nGood luck! Remember: staying hydrated helps.`,
-  END_ERROR: "Sorry, there was an error ending your fast. Please try again.",
-  START_ERROR: "Sorry, there was an error starting your fast. Please try again.",
+// Daily summary messages
+export const DAILY_SUMMARY_MESSAGES = {
+  GENERATING: "☀️ Generating your daily summary...",
+  GENERATION_ERROR: "Sorry, I had trouble generating your daily summary. Please try again.",
+  ONBOARDING_REQUIRED: "Please complete onboarding first to get your daily summary. Type /start to begin.",
+  NO_DATA: "You haven't logged any meals today yet. Send me a photo of your food to get started!",
 } as const;
 
 // Food logging messages

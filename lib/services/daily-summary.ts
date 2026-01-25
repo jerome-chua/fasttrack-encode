@@ -1,12 +1,12 @@
 import { InMemoryRunner } from "@google/adk";
-import { INSIGHTS_AGENT_NAME, insightsAgent } from "../agents/insights-agent";
+import { DAILY_SUMMARY_AGENT_NAME, dailySummaryAgent } from "../agents/daily-summary-agent";
 
-const INSIGHTS_TIMEOUT_MS = 45000; // 45 seconds
+const DAILY_SUMMARY_TIMEOUT_MS = 30000; // 30 seconds
 
-async function generateInsightsInternal(telegramId: number): Promise<string> {
-  const APP_NAME = "insightsGenerator"
+async function generateDailySummaryInternal(telegramId: number): Promise<string> {
+  const APP_NAME = "dailySummaryGenerator";
   const runner = new InMemoryRunner({
-    agent: insightsAgent,
+    agent: dailySummaryAgent,
     appName: APP_NAME,
   });
 
@@ -20,7 +20,7 @@ async function generateInsightsInternal(telegramId: number): Promise<string> {
     role: "user" as const,
     parts: [
       {
-        text: `Generate personalized health insights for telegram_id: ${telegramId}. Use all available tools to gather their data, then provide comprehensive insights.`,
+        text: `Generate today's daily summary for telegram_id: ${telegramId}. Use the tools to gather their data.`,
       },
     ],
   };
@@ -31,7 +31,7 @@ async function generateInsightsInternal(telegramId: number): Promise<string> {
     sessionId: session.id,
     newMessage,
   })) {
-    const isAgentResponse = event.author === INSIGHTS_AGENT_NAME;
+    const isAgentResponse = event.author === DAILY_SUMMARY_AGENT_NAME;
     const contentParts = event.content?.parts;
 
     if (isAgentResponse && contentParts) {
@@ -43,15 +43,16 @@ async function generateInsightsInternal(telegramId: number): Promise<string> {
       }
     }
   }
+
   return agentResponse;
 }
 
-export async function generateInsights(telegramId: number): Promise<string> {
+export async function generateDailySummary(telegramId: number): Promise<string> {
   const timeoutPromise = new Promise<string>((_, reject) => {
-    setTimeout(() => reject(new Error("Insights generation timed out")), INSIGHTS_TIMEOUT_MS);
+    setTimeout(() => reject(new Error("Daily summary generation timed out")), DAILY_SUMMARY_TIMEOUT_MS);
   });
 
-  const insightsPromise = generateInsightsInternal(telegramId);
+  const summaryPromise = generateDailySummaryInternal(telegramId);
 
-  return Promise.race([insightsPromise, timeoutPromise]);
+  return Promise.race([summaryPromise, timeoutPromise]);
 }

@@ -1,5 +1,5 @@
 import { Context } from "grammy";
-import { menuKeyboard } from "../constants/keyboards";
+import { menuButtons } from "../constants/keyboards";
 import { LOGIN_MESSAGES } from "../constants/messages";
 import { verifyLoginCode } from "../services/auth";
 
@@ -15,7 +15,7 @@ export async function handleLoginCode(ctx: Context, code: string): Promise<void>
   if (result.success) {
     await ctx.reply(
       LOGIN_MESSAGES.SUCCESS,
-      { reply_markup: menuKeyboard }
+      { reply_markup: menuButtons }
     );
   } else {
     await ctx.reply(

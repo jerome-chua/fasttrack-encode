@@ -1,6 +1,6 @@
 import { Context } from "grammy";
 import { getUser } from "../supabase";
-import { menuKeyboard } from "../constants/keyboards";
+import { menuButtons } from "../constants/keyboards";
 import { FOOD_LOGGING_MESSAGES } from "../constants/messages";
 import { getLargestPhoto, downloadPhotoFromTelegram } from "../utils/photo-processing";
 import { analyzeFoodPhoto } from "../services/food-analyzer";
@@ -40,7 +40,7 @@ export async function handlePhotoMessage(
       return;
     }
 
-    await ctx.reply(FOOD_LOGGING_MESSAGES.ANALYZING, { reply_markup: menuKeyboard });
+    await ctx.reply(FOOD_LOGGING_MESSAGES.ANALYZING, { reply_markup: menuButtons });
     console.log("🔍 Starting food analysis...");
 
     // Get the largest photo (best quality)
@@ -55,13 +55,13 @@ export async function handlePhotoMessage(
 
     await ctx.reply(
       agentResponse || FOOD_LOGGING_MESSAGES.MEAL_LOGGED,
-      { reply_markup: menuKeyboard }
+      { reply_markup: menuButtons }
     );
   } catch (error) {
     console.error("❌ Error analyzing food photo:", error);
     await ctx.reply(
       FOOD_LOGGING_MESSAGES.ANALYSIS_ERROR,
-      { reply_markup: menuKeyboard }
+      { reply_markup: menuButtons }
     );
   }
 }

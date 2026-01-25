@@ -1,6 +1,6 @@
 import { Context } from "grammy";
 import { getUser, createUser, User } from "../supabase";
-import { menuKeyboard } from "../constants/keyboards";
+import { menuButtons } from "../constants/keyboards";
 import { START_MESSAGES, ONBOARDING_MESSAGES } from "../constants/messages";
 import { handleError } from "../utils/error-handler";
 
@@ -30,7 +30,7 @@ export async function sendOnboardingPrompt(ctx: Context, user: User): Promise<vo
     case "completed":
       await ctx.reply(
         ONBOARDING_MESSAGES.COMPLETED,
-        { reply_markup: menuKeyboard }
+        { reply_markup: menuButtons }
       );
       break;
   }
@@ -54,7 +54,7 @@ export async function handleStartCommand(ctx: Context): Promise<void> {
       // Returning user - show menu
       await ctx.reply(
         START_MESSAGES.WELCOME_BACK(firstName),
-        { reply_markup: menuKeyboard }
+        { reply_markup: menuButtons }
       );
       return;
     }
