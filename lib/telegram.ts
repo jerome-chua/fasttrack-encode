@@ -22,6 +22,16 @@ if (!token) {
 
 export const bot = new Bot(token);
 
+// Track processed message IDs to prevent duplicate processing
+// Telegram sends multiple photo sizes, but they all share the same message_id
+const processedMessages = new Set<number>();
+const MESSAGE_CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+// Clean up old message IDs periodically to prevent memory leaks
+setInterval(() => {
+  processedMessages.clear();
+}, MESSAGE_CLEANUP_INTERVAL);
+
 // Menu keyboard (shown after onboarding complete)
 const menuKeyboard = new Keyboard()
   .text("🍽️ Food Log").text("⏰ Break Fast").row()
@@ -261,7 +271,18 @@ bot.hears("❓ Ask Questions", async (ctx) => {
 
 // Handle photo messages (food logging)
 bot.on("message:photo", async (ctx) => {
-  console.log("📸 Photo received from user:", ctx.from?.id);
+  const messageId = ctx.message.message_id;
+  
+  // Skip if we've already processed this message (Telegram sends multiple photo sizes with same message_id)
+  if (processedMessages.has(messageId)) {
+    console.log("⏭️ Skipping duplicate photo message:", messageId);
+    return;
+  }
+  
+  // Mark this message as processed
+  processedMessages.add(messageId);
+  
+  console.log("📸 Photo received from user:", ctx.from?.id, "message_id:", messageId);
 
   const telegramId = ctx.from?.id;
   if (!telegramId) return;
