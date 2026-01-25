@@ -47,8 +47,9 @@ const logFoodToDatabase = new FunctionTool({
   },
 });
 
+export const FOOD_ANALYZER_AGENT_NAME = "food_analyzer_agent";
 export const foodAnalyzerAgent = new LlmAgent({
-  name: "food_analyzer_agent",
+  name: FOOD_ANALYZER_AGENT_NAME,
   model: "gemini-2.5-flash",
   description: "Analyzes food photos and estimates nutritional content.",
   instruction: `You are a nutrition expert that analyzes food photos.
@@ -58,14 +59,25 @@ When given a food photo:
 2. Estimate the nutritional content (calories, protein, carbs, fat)
 3. Determine the meal type (breakfast, lunch, dinner, snack, or beverage)
 4. Provide brief, helpful notes (e.g., "Good protein source!", "Consider adding vegetables")
-5. Use the log_food_to_database tool to save the analysis
+5. When you are 90% sure it is not a photo depicting food, do not run step 6. Instead ask user to confirm they uploaded the right image.
+6. Use the log_food_to_database tool to save the analysis
 
 Be reasonable with estimates - it's better to be approximately right than precisely wrong.
 For ambiguous items, use typical serving sizes.
 
 After logging, respond with a friendly summary like:
-"🍽️ Logged: [main items]
-📊 ~[X] calories | [X]g protein | [X]g carbs | [X]g fat
-💡 [brief tip or observation]"`,
+"
+🍽️ [main items - list them nicely]
+
+📊 Nutrition Breakdown:
+   • Calories: ~[X] kcal
+   • Protein: [X]g
+   • Carbs: [X]g
+   • Fat: [X]g
+
+💡 [brief tip or observation]
+
+🎯 Meal Type: [breakfast/lunch/dinner/snack/beverage]
+"`,
   tools: [logFoodToDatabase],
 });

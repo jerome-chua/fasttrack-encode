@@ -1,7 +1,6 @@
 import { InMemoryRunner } from "@google/adk";
-import { foodAnalyzerAgent } from "../agents/food-analyzer";
+import { FOOD_ANALYZER_AGENT_NAME, foodAnalyzerAgent } from "../agents/food-analyzer";
 
-// Analyze food photo using the ADK agent
 export async function analyzeFoodPhoto(
   imageBase64: string,
   mimeType: string,
@@ -10,18 +9,16 @@ export async function analyzeFoodPhoto(
   console.log("🤖 Starting ADK agent...");
   const runner = new InMemoryRunner({
     agent: foodAnalyzerAgent,
-    appName: "fasttrack",
+    appName: "foodAnalyzer",
   });
 
-  // Create a session for this user
   const userId = telegramId.toString();
   const session = await runner.sessionService.createSession({
-    appName: "fasttrack",
+    appName: "foodAnalyzer",
     userId,
   });
 
-  // Build the message with image
-  const newMessage = {
+  const newMessageWithImage = {
     role: "user" as const,
     parts: [
       {
@@ -36,28 +33,24 @@ export async function analyzeFoodPhoto(
     ],
   };
 
-  // Run the agent and collect events
   let agentResponse = "";
-  console.log("🚀 Running agent for session:", session.id);
   for await (const event of runner.runAsync({
     userId,
     sessionId: session.id,
-    newMessage,
+    newMessage: newMessageWithImage,
   })) {
     console.log("📨 Event received:", event.author, event.content?.parts?.length, "parts");
-    // Only capture text from the agent's final response (after tool execution)
-    // Skip tool calls and intermediate responses
-    if (event.author === "food_analyzer_agent" && event.content?.parts) {
-      // Clear previous response to only keep the latest (final) agent response
+    const isAgentResponse = event.author === FOOD_ANALYZER_AGENT_NAME;
+    const contentParts = event.content?.parts;
+
+    if (isAgentResponse && contentParts) {
       agentResponse = "";
-      for (const part of event.content.parts) {
+      for (const part of contentParts) {
         if ("text" in part && part.text) {
           agentResponse += part.text;
         }
       }
     }
   }
-
-  console.log("✅ Agent response:", agentResponse.substring(0, 100) + "...");
   return agentResponse;
 }
