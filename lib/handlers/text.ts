@@ -1,11 +1,12 @@
 import { Context } from "grammy";
 import { getUser, updateUser, logWeight, User } from "../supabase";
 import { menuButtons } from "../constants/keyboards";
-import { START_MESSAGES, ONBOARDING_MESSAGES, TEXT_MESSAGES } from "../constants/messages";
+import { START_MESSAGES, ONBOARDING_MESSAGES, TEXT_MESSAGES, QUESTIONS_MESSAGES } from "../constants/messages";
 import { isLoginCode, validateNumber, validateWeight, validateHeight } from "../utils/validation";
 import { handleLoginCode } from "./login";
 import { sendOnboardingPrompt } from "./start";
 import { handleError } from "../utils/error-handler";
+import { answerQuestion } from "../services/questions";
 
 // Handle other text messages (onboarding flow + login codes)
 export async function handleTextMessage(ctx: Context): Promise<void> {
@@ -34,12 +35,20 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
       return;
     }
 
-    // If onboarding complete, treat as a question
+    // If onboarding complete, route to Questions Agent
     if (user.onboarding_step === "completed") {
-      await ctx.reply(
-        TEXT_MESSAGES.GENERAL_RESPONSE,
-        { reply_markup: menuButtons }
-      );
+      await ctx.reply(QUESTIONS_MESSAGES.THINKING, { reply_markup: menuButtons });
+
+      try {
+        const answer = await answerQuestion(telegramId, text);
+        await ctx.reply(
+          answer || QUESTIONS_MESSAGES.ERROR,
+          { reply_markup: menuButtons }
+        );
+      } catch (error) {
+        console.error("❌ Error answering question:", error);
+        await ctx.reply(QUESTIONS_MESSAGES.ERROR, { reply_markup: menuButtons });
+      }
       return;
     }
 

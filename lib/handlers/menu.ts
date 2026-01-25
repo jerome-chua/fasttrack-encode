@@ -1,6 +1,6 @@
 import { Context } from "grammy";
 import { menuButtons } from "../constants/keyboards";
-import { MENU_MESSAGES, INSIGHTS_MESSAGES, DAILY_SUMMARY_MESSAGES } from "../constants/messages";
+import { MENU_MESSAGES, INSIGHTS_MESSAGES, DAILY_SUMMARY_MESSAGES, QUESTIONS_MESSAGES } from "../constants/messages";
 import { getUser } from "../supabase";
 import { generateInsights } from "../services/insights";
 import { generateDailySummary } from "../services/daily-summary";
@@ -72,7 +72,7 @@ export async function handleGetInsightsButton(ctx: Context): Promise<void> {
 // Handle menu button: Ask Questions
 export async function handleAskQuestionsButton(ctx: Context): Promise<void> {
   await ctx.reply(
-    MENU_MESSAGES.ASK_QUESTIONS,
+    QUESTIONS_MESSAGES.PROMPT,
     { reply_markup: menuButtons }
   );
 }

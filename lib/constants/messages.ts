@@ -58,6 +58,14 @@ export const INSIGHTS_MESSAGES = {
   ONBOARDING_REQUIRED: "Please complete onboarding first to get personalized insights. Type /start to begin.",
 } as const;
 
+// Questions messages
+export const QUESTIONS_MESSAGES = {
+  PROMPT: "💬 What would you like to know?\n\nAsk me about intermittent fasting, nutrition, your progress, or anything related to your health journey!",
+  THINKING: "🤔 Let me think about that...",
+  ERROR: "Sorry, I had trouble answering your question. Please try again.",
+  ONBOARDING_REQUIRED: "Please complete onboarding first. Type /start to begin.",
+} as const;
+
 // Text message responses
 export const TEXT_MESSAGES = {
   GENERAL_RESPONSE: "I received your message! Use the menu below to log food, track fasting, or get insights.",
