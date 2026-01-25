@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
+import { Copy, Check } from 'lucide-react'
 
 type LoginState = 'loading' | 'code' | 'waiting' | 'success' | 'expired' | 'error'
 
@@ -12,6 +13,14 @@ export default function LoginPage() {
   const [expiresAt, setExpiresAt] = useState<Date | null>(null)
   const [timeLeft, setTimeLeft] = useState<number>(0)
   const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  const copyCode = async () => {
+    if (!code) return
+    await navigator.clipboard.writeText(code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   // Generate a new login code
   const generateCode = useCallback(async () => {
@@ -118,12 +127,20 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Card */}
           <div className="rounded-2xl bg-white p-8 shadow-lg">
-            <h1 className="mb-2 text-center text-2xl font-bold text-fasttrack-ocean">
+            <h1 className="mb-6 text-center text-2xl font-bold text-fasttrack-ocean">
               Login to FastTrack
             </h1>
-            <p className="mb-8 text-center text-fasttrack-ocean/70">
-              Send the code below to our Telegram bot to log in
-            </p>
+            <div className="mb-8 space-y-2 text-center">
+              <p className="text-sm text-fasttrack-ocean/70">
+                <span className="font-semibold text-fasttrack-ocean">Step 1:</span> Open the FastTrack bot on Telegram
+              </p>
+              <p className="text-sm text-fasttrack-ocean/70">
+                <span className="font-semibold text-fasttrack-ocean">Step 2:</span> Send the code below to the bot
+              </p>
+              <p className="text-sm text-fasttrack-ocean/70">
+                <span className="font-semibold text-fasttrack-ocean">Step 3:</span> You&apos;ll be logged in automatically
+              </p>
+            </div>
 
             {/* Loading State */}
             {state === 'loading' && (
@@ -156,7 +173,18 @@ export default function LoginPage() {
             {(state === 'code' || state === 'waiting') && code && (
               <div className="flex flex-col items-center gap-6">
                 {/* Code Box */}
-                <div className="w-full rounded-xl bg-fasttrack-mist p-6 text-center">
+                <div className="relative w-full rounded-xl bg-fasttrack-mist p-6 text-center">
+                  <button
+                    onClick={copyCode}
+                    className="absolute right-3 top-3 rounded-lg p-2 text-fasttrack-ocean/50 transition-colors hover:bg-fasttrack-ocean/10 hover:text-fasttrack-ocean"
+                    aria-label="Copy code"
+                  >
+                    {copied ? (
+                      <Check className="h-5 w-5 text-green-600" />
+                    ) : (
+                      <Copy className="h-5 w-5" />
+                    )}
+                  </button>
                   <p className="mb-2 text-sm font-medium uppercase tracking-wider text-fasttrack-ocean/50">
                     Your Login Code
                   </p>
@@ -164,20 +192,7 @@ export default function LoginPage() {
                     {code}
                   </p>
                   <p className="mt-3 text-sm text-fasttrack-ocean/50">
-                    Expires in {formatTime(timeLeft)}
-                  </p>
-                </div>
-
-                {/* Instructions */}
-                <div className="w-full space-y-3 text-center">
-                  <p className="text-sm text-fasttrack-ocean/70">
-                    <span className="font-semibold text-fasttrack-ocean">Step 1:</span> Open the FastTrack bot on Telegram
-                  </p>
-                  <p className="text-sm text-fasttrack-ocean/70">
-                    <span className="font-semibold text-fasttrack-ocean">Step 2:</span> Send this code to the bot
-                  </p>
-                  <p className="text-sm text-fasttrack-ocean/70">
-                    <span className="font-semibold text-fasttrack-ocean">Step 3:</span> You&apos;ll be logged in automatically
+                    {copied ? 'Copied!' : `Expires in ${formatTime(timeLeft)}`}
                   </p>
                 </div>
 

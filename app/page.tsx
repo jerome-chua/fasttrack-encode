@@ -20,18 +20,10 @@ export default function Home() {
             About
           </a>
           <a
-            href="/login"
-            className="text-fasttrack-ocean transition-colors hover:text-fasttrack-azure"
-          >
-            Login
-          </a>
-          <a
-            href="https://t.me/FastTrackOcBot"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/start"
             className="rounded-lg bg-fasttrack-ocean px-4 py-2 font-medium text-white transition-colors hover:bg-fasttrack-azure"
           >
-            Get Started
+            Start Tracking
           </a>
         </div>
       </nav>
@@ -241,12 +233,10 @@ export default function Home() {
             Join thousands of users who are unlocking their potential every day.
           </p>
           <a
-            href="https://t.me/FastTrackOcBot"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/start"
             className="inline-block rounded-lg bg-fasttrack-ocean px-8 py-4 text-lg font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fasttrack-azure"
           >
-            BEGIN
+            START TRACKING
           </a>
         </div>
       </section>
