@@ -51,6 +51,13 @@ export const LOGIN_MESSAGES = {
     `❌ ${error}.\n\nPlease check the code and try again, or request a new one from the login page.`,
 } as const;
 
+// Insights messages
+export const INSIGHTS_MESSAGES = {
+  GENERATING: "🔍 Analyzing your data to generate personalized insights...\n\nThis may take a moment.",
+  GENERATION_ERROR: "Sorry, I had trouble generating your insights. Please try again in a moment.",
+  ONBOARDING_REQUIRED: "Please complete onboarding first to get personalized insights. Type /start to begin.",
+} as const;
+
 // Text message responses
 export const TEXT_MESSAGES = {
   GENERAL_RESPONSE: "I received your message! Use the menu below to log food, track fasting, or get insights.",
