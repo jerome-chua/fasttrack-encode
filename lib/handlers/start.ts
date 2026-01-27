@@ -1,5 +1,6 @@
 import { Context } from "grammy";
-import { getUser, createUser, User } from "../supabase";
+import { getUser, createUser } from "../supabase";
+import { User } from "../types";
 import { menuButtons } from "../constants/keyboards";
 import { START_MESSAGES, ONBOARDING_MESSAGES } from "../constants/messages";
 import { handleError } from "../utils/error-handler";

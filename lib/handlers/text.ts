@@ -1,5 +1,5 @@
 import { Context } from "grammy";
-import { getUser, updateUser, logWeight, User } from "../supabase";
+import { getUser, updateUser, logWeight } from "../supabase";
 import { menuButtons } from "../constants/keyboards";
 import { START_MESSAGES, ONBOARDING_MESSAGES, TEXT_MESSAGES, QUESTIONS_MESSAGES } from "../constants/messages";
 import { isLoginCode, validateNumber, validateWeight, validateHeight } from "../utils/validation";
@@ -15,7 +15,6 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
   }
 
   const telegramId = ctx.from?.id;
-  const firstName = ctx.from?.first_name ?? "there";
   const text = ctx.message.text.trim();
 
   if (!telegramId) return;
@@ -69,7 +68,6 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
           await ctx.reply(weightValidation.error || TEXT_MESSAGES.INVALID_WEIGHT);
           return;
         }
-        // Save weight and log it
         const updatedUser = await updateUser(telegramId, {
           current_weight: num,
           onboarding_step: "goal",

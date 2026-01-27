@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/hooks/useAuth'
 import WeightChart from '@/components/WeightChart'
+import CaloriesPieChart from '@/components/CaloriesPieChart'
 
 export default function DashboardPage() {
   const { user, isLoading, logout } = useAuth()
@@ -110,12 +111,20 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Weight Chart Section */}
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="mb-6 text-xl font-semibold text-fasttrack-ocean">
-            Weight Progress
-          </h2>
-          <WeightChart />
+        {/* Charts Section */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Weight Chart */}
+          <div className="lg:col-span-2">
+            <WeightChart />
+          </div>
+
+          {/* Calories Pie Chart */}
+          <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Today&apos;s Calories
+            </h3>
+            <CaloriesPieChart />
+          </div>
         </div>
 
         {/* Quick Actions */}

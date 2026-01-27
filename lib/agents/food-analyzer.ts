@@ -1,6 +1,7 @@
 import { FunctionTool, LlmAgent } from "@google/adk";
 import { z } from "zod";
-import { createFoodLog, FoodItem } from "../supabase";
+import { createFoodLog } from "../supabase";
+import { FoodItem } from "../types";
 import { getMealTypeByTime } from "../utils/validation";
 
 const logFoodToDatabase = new FunctionTool({

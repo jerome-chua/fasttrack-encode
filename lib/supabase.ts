@@ -1,4 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
+import type {
+  User,
+  WeightLog,
+  FastingPeriod,
+  FoodItem,
+  FoodLog,
+  DailySummary,
+} from "./types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
@@ -8,68 +16,6 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
-
-// ============================================================================
-// Types
-// ============================================================================
-
-export interface User {
-  telegram_id: number;
-  first_name: string;
-  current_weight: number | null;
-  goal_weight: number | null;
-  height: number | null;
-  onboarding_step: "weight" | "goal" | "height" | "completed";
-  created_at: string;
-  updated_at: string;
-}
-
-export interface WeightLog {
-  id: number;
-  telegram_id: number;
-  weight: number;
-  logged_at: string;
-}
-
-export interface FastingPeriod {
-  id: number;
-  telegram_id: number;
-  started_at: string;
-  ended_at: string | null;
-}
-
-export interface FoodItem {
-  name: string;
-  calories: number;
-  portion: string;
-}
-
-export interface FoodLog {
-  id: number;
-  telegram_id: number;
-  image_url: string | null;
-  calories: number;
-  protein: number | null;
-  carbs: number | null;
-  fat: number | null;
-  food_items: FoodItem[] | null;
-  meal_type: "breakfast" | "lunch" | "dinner" | "snack" | "beverage" | "supper" | null;
-  notes: string | null;
-  logged_at: string;
-}
-
-export interface DailySummary {
-  id: number;
-  telegram_id: number;
-  summary_date: string;
-  total_calories: number | null;
-  total_protein: number | null;
-  total_carbs: number | null;
-  total_fat: number | null;
-  fasting_hours: number | null;
-  ai_summary: string | null;
-  created_at: string;
-}
 
 // ============================================================================
 // User Functions
@@ -368,6 +314,59 @@ export async function getDailySummaries(telegramId: number, limit = 30): Promise
     return [];
   }
   return data || [];
+}
+
+// ============================================================================
+// Calorie Aggregation Functions
+// ============================================================================
+
+export interface CaloriesByMealType {
+  mealType: string;
+  calories: number;
+  percentage: number;
+}
+
+export interface TodayCaloriesResult {
+  data: CaloriesByMealType[];
+  totalCalories: number;
+}
+
+export async function getTodayCaloriesByMealType(telegramId: number): Promise<TodayCaloriesResult> {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const { data: foodLogs, error } = await supabase
+    .from("food_logs")
+    .select("calories, meal_type")
+    .eq("telegram_id", telegramId)
+    .gte("logged_at", startOfDay.toISOString())
+    .lte("logged_at", endOfDay.toISOString());
+
+  if (error) {
+    console.error("Error fetching food logs for calories:", error);
+    return { data: [], totalCalories: 0 };
+  }
+
+  // Aggregate calories by meal type
+  const caloriesByMealType: Record<string, number> = {};
+  let totalCalories = 0;
+
+  for (const log of foodLogs || []) {
+    const mealType = log.meal_type || "other";
+    caloriesByMealType[mealType] = (caloriesByMealType[mealType] || 0) + (log.calories || 0);
+    totalCalories += log.calories || 0;
+  }
+
+  // Convert to array format
+  const data = Object.entries(caloriesByMealType).map(([mealType, calories]) => ({
+    mealType,
+    calories,
+    percentage: totalCalories > 0 ? Math.round((calories / totalCalories) * 100) : 0,
+  }));
+
+  return { data, totalCalories };
 }
 
 // ============================================================================
