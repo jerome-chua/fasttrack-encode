@@ -1,6 +1,7 @@
 import { FunctionTool, LlmAgent } from "@google/adk";
 import { z } from "zod";
 import { createFoodLog, FoodItem } from "../supabase";
+import { getMealTypeByTime } from "../utils/validation";
 
 const logFoodToDatabase = new FunctionTool({
   name: "log_food_to_database",
@@ -18,10 +19,11 @@ const logFoodToDatabase = new FunctionTool({
         portion: z.string().describe("Portion size description"),
       })
     ).describe("List of identified food items"),
-    meal_type: z.enum(["breakfast", "lunch", "dinner", "snack", "beverage"]).describe("Type of meal based on the food"),
     notes: z.string().describe("Brief notes about the meal, tips, or observations"),
   }),
-  execute: async ({ telegram_id, calories, protein, carbs, fat, food_items, meal_type, notes }) => {
+  execute: async ({ telegram_id, calories, protein, carbs, fat, food_items, notes }) => {
+    const meal_type = getMealTypeByTime();
+
     const foodLog = await createFoodLog({
       telegram_id,
       calories,
@@ -57,10 +59,11 @@ export const foodAnalyzerAgent = new LlmAgent({
 When given a food photo:
 1. Identify all visible food items and estimate portion sizes
 2. Estimate the nutritional content (calories, protein, carbs, fat)
-3. Determine the meal type (breakfast, lunch, dinner, snack, or beverage)
-4. Provide brief, helpful notes (e.g., "Good protein source!", "Consider adding vegetables")
-5. When you are 90% sure it is not a photo depicting food, do not run step 6. Instead ask user to confirm they uploaded the right image.
-6. Use the log_food_to_database tool to save the analysis
+3. Provide brief, helpful notes (e.g., "Good protein source!", "Consider adding vegetables")
+4. When you are 90% sure it is not a photo depicting food, do not run step 5. Instead ask user to confirm they uploaded the right image.
+5. Use the log_food_to_database tool to save the analysis
+
+Note: Meal type is automatically determined based on the time of logging, so you don't need to specify it.
 
 Be reasonable with estimates - it's better to be approximately right than precisely wrong.
 For ambiguous items, use typical serving sizes.
@@ -76,8 +79,6 @@ After logging, respond with a friendly summary like:
    • Fat: [X]g
 
 💡 [brief tip or observation]
-
-🎯 Meal Type: [breakfast/lunch/dinner/snack/beverage]
 "`,
   tools: [logFoodToDatabase],
 });

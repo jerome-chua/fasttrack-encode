@@ -53,7 +53,7 @@ export interface FoodLog {
   carbs: number | null;
   fat: number | null;
   food_items: FoodItem[] | null;
-  meal_type: "breakfast" | "lunch" | "dinner" | "snack" | "beverage" | null;
+  meal_type: "breakfast" | "lunch" | "dinner" | "snack" | "beverage" | "supper" | null;
   notes: string | null;
   logged_at: string;
 }

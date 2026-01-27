@@ -1,3 +1,5 @@
+import { MealType } from "../types";
+
 // Check if text looks like a login code (8 alphanumeric characters)
 export function isLoginCode(text: string): boolean {
   return /^[A-Z0-9]{8}$/i.test(text);
@@ -46,4 +48,29 @@ export function validateHeight(height: number): { valid: boolean; error?: string
     return { valid: false, error: "Please enter a height between 100 and 250 cm." };
   }
   return { valid: true };
+}
+
+export function getMealTypeByTime(date: Date = new Date()): MealType {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const timeInMinutes = hours * 60 + minutes;
+
+  // Convert time ranges to minutes for easier comparison
+  const BREAKFAST_START = 4 * 60 + 1;   // 4:01am = 241
+  const LUNCH_START = 11 * 60;          // 11:00am = 660
+  const SNACK_START = 15 * 60;          // 3:00pm = 900
+  const DINNER_START = 17 * 60 + 30;    // 5:30pm = 1050
+  const SUPPER_START = 22 * 60 + 30;    // 10:30pm = 1350
+
+  if (timeInMinutes >= BREAKFAST_START && timeInMinutes < LUNCH_START) {
+    return "breakfast";
+  } else if (timeInMinutes >= LUNCH_START && timeInMinutes < SNACK_START) {
+    return "lunch";
+  } else if (timeInMinutes >= SNACK_START && timeInMinutes < DINNER_START) {
+    return "snack";
+  } else if (timeInMinutes >= DINNER_START && timeInMinutes < SUPPER_START) {
+    return "dinner";
+  } else {
+    return "supper";
+  }
 }
