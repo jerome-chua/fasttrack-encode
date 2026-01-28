@@ -8,6 +8,14 @@ import { sendOnboardingPrompt } from "./start";
 import { handleError } from "../utils/error-handler";
 import { answerQuestion } from "../services/questions";
 
+// Button texts that should be handled by button handlers, not text handler
+const BUTTON_TEXTS = new Set([
+  "🤳🏼 Log Food",
+  "☀️ Daily Summary",
+  "🧠 Get Insights",
+  "💬 Ask Questions",
+]);
+
 // Handle other text messages (onboarding flow + login codes)
 export async function handleTextMessage(ctx: Context): Promise<void> {
   if (!ctx.message || !ctx.message.text) {
@@ -18,6 +26,10 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
   const text = ctx.message.text.trim();
 
   if (!telegramId) return;
+
+  if (BUTTON_TEXTS.has(text)) {
+    return;
+  }
 
   try {
     // Check if this is a login code (8 alphanumeric characters)
