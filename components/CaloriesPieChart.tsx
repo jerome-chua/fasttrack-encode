@@ -18,7 +18,10 @@ interface PieChartProps {
   height: number;
   data: CalorieData[];
   totalCalories: number;
+  period: string;
 }
+
+type Period = "1d" | "7d" | "30d";
 
 // Constants
 const MEAL_TYPE_LABELS: Record<string, string> = {
@@ -41,12 +44,24 @@ const MEAL_TYPE_COLORS: Record<string, string> = {
   other: "#6b7280",     // gray
 };
 
+const PERIOD_LABELS: Record<Period, string> = {
+  "1d": "today",
+  "7d": "(7 days)",
+  "30d": "(30 days)",
+};
+
+const TAB_OPTIONS: { value: Period; label: string }[] = [
+  { value: "1d", label: "1 Day" },
+  { value: "7d", label: "7 Days" },
+  { value: "30d", label: "30 Days" },
+];
+
 // Accessors
 const getValue = (d: CalorieData) => d.calories;
 const getLabel = (d: CalorieData) => MEAL_TYPE_LABELS[d.mealType] || d.mealType;
 const getColor = (d: CalorieData) => MEAL_TYPE_COLORS[d.mealType] || MEAL_TYPE_COLORS.other;
 
-function CaloriesPieChartInner({ width, height, data, totalCalories }: PieChartProps) {
+function CaloriesPieChartInner({ width, height, data, totalCalories, period }: PieChartProps) {
   const radius = Math.min(width, height) / 2;
   const centerX = width / 2;
   const centerY = height / 2;
@@ -57,10 +72,13 @@ function CaloriesPieChartInner({ width, height, data, totalCalories }: PieChartP
     range: data.map(getColor),
   });
 
+  const periodLabel = PERIOD_LABELS[period as Period] || "today";
+  const isAverage = period !== "1d";
+
   if (width < 100 || data.length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-fasttrack-ocean/50">
-        No meals logged today
+        No meals logged {period === "1d" ? "today" : `in the last ${period === "7d" ? "7" : "30"} days`}
       </div>
     );
   }
@@ -126,7 +144,7 @@ function CaloriesPieChartInner({ width, height, data, totalCalories }: PieChartP
             fontSize={12}
             fill="#6b7280"
           >
-            kcal today
+            {isAverage ? "avg kcal " : "kcal "}{periodLabel}
           </text>
         </Group>
       </svg>
@@ -149,11 +167,38 @@ function CaloriesPieChartInner({ width, height, data, totalCalories }: PieChartP
   );
 }
 
+function PeriodTabs({
+  selectedPeriod,
+  onPeriodChange
+}: {
+  selectedPeriod: Period;
+  onPeriodChange: (period: Period) => void;
+}) {
+  return (
+    <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+      {TAB_OPTIONS.map((option) => (
+        <button
+          key={option.value}
+          onClick={() => onPeriodChange(option.value)}
+          className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+            selectedPeriod === option.value
+              ? "bg-white text-fasttrack-ocean shadow-sm"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function CaloriesPieChart() {
   const [data, setData] = useState<CalorieData[]>([]);
   const [totalCalories, setTotalCalories] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [period, setPeriod] = useState<Period>("1d");
 
   useEffect(() => {
     const fetchCalories = async () => {
@@ -163,8 +208,11 @@ export default function CaloriesPieChart() {
         return;
       }
 
+      setIsLoading(true);
+      setError(null);
+
       try {
-        const res = await fetch("/api/calories/today", {
+        const res = await fetch(`/api/calories/period?period=${period}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -184,26 +232,43 @@ export default function CaloriesPieChart() {
     };
 
     fetchCalories();
-  }, []);
+  }, [period]);
+
+  const handlePeriodChange = (newPeriod: Period) => {
+    setPeriod(newPeriod);
+  };
 
   if (isLoading) {
     return (
-      <div className="flex h-[300px] items-center justify-center">
-        <div className="text-fasttrack-ocean/50">Loading...</div>
+      <div className="flex h-[300px] flex-col">
+        <div className="flex justify-end">
+          <PeriodTabs selectedPeriod={period} onPeriodChange={handlePeriodChange} />
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-fasttrack-ocean/50">Loading...</div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-[300px] items-center justify-center">
-        <div className="text-red-500">{error}</div>
+      <div className="flex h-[300px] flex-col">
+        <div className="flex justify-end">
+          <PeriodTabs selectedPeriod={period} onPeriodChange={handlePeriodChange} />
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-red-500">{error}</div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="h-[300px]">
+      <div className="flex justify-end">
+        <PeriodTabs selectedPeriod={period} onPeriodChange={handlePeriodChange} />
+      </div>
       <ParentSize>
         {({ width, height }) => (
           <CaloriesPieChartInner
@@ -211,6 +276,7 @@ export default function CaloriesPieChart() {
             height={height - 60}
             data={data}
             totalCalories={totalCalories}
+            period={period}
           />
         )}
       </ParentSize>
