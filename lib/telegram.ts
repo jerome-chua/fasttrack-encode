@@ -2,6 +2,7 @@ import { Bot } from "grammy";
 import { handleStartCommand } from "./handlers/start";
 import { handlePhotoMessage } from "./handlers/food-logging";
 import { handleTextMessage } from "./handlers/text";
+import { handleLocationMessage } from "./handlers/location";
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -23,4 +24,5 @@ bot.command("start", handleStartCommand);
 
 // Register message handlers
 bot.on("message:photo", (ctx) => handlePhotoMessage(ctx, processedMessages));
+bot.on("message:location", handleLocationMessage);
 bot.on("message:text", handleTextMessage);

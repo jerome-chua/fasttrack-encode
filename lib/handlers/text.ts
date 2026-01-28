@@ -1,8 +1,9 @@
 import { Context } from "grammy";
 import { getUser, updateUser, logWeight } from "../supabase";
-import { menuButtons } from "../constants/keyboards";
+import { menuButtons, manualTimezoneKeyboard } from "../constants/keyboards";
 import { START_MESSAGES, ONBOARDING_MESSAGES, TEXT_MESSAGES, QUESTIONS_MESSAGES } from "../constants/messages";
 import { isLoginCode, validateNumber, validateWeight, validateHeight } from "../utils/validation";
+import { isValidTimezone } from "../utils/timezone";
 import { handleLoginCode } from "./login";
 import { sendOnboardingPrompt } from "./start";
 import { handleError } from "../utils/error-handler";
@@ -15,6 +16,9 @@ const BUTTON_TEXTS = new Set([
   "🧠 Get Insights",
   "💬 Ask Questions",
 ]);
+
+// Special button for timezone manual entry
+const TIMEZONE_MANUAL_BUTTON = "Enter manually instead";
 
 // Handle other text messages (onboarding flow + login codes)
 export async function handleTextMessage(ctx: Context): Promise<void> {
@@ -63,7 +67,52 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
       return;
     }
 
-    // Handle onboarding steps
+    // Handle timezone step separately (text-based, not number-based)
+    if (user.onboarding_step === "timezone") {
+      // User clicked "Enter manually instead" button
+      if (text === TIMEZONE_MANUAL_BUTTON) {
+        await ctx.reply(ONBOARDING_MESSAGES.TIMEZONE_MANUAL, {
+          reply_markup: manualTimezoneKeyboard,
+        });
+        return;
+      }
+
+      // Validate and save timezone
+      if (isValidTimezone(text)) {
+        const updatedUser = await updateUser(telegramId, {
+          timezone: text,
+          onboarding_step: "completed",
+        });
+
+        if (updatedUser) {
+          const weightDiff = (updatedUser.current_weight ?? 0) - (updatedUser.goal_weight ?? 0);
+          const completionMessage = weightDiff > 0
+            ? ONBOARDING_MESSAGES.COMPLETED_WITH_GOAL(
+                updatedUser.first_name,
+                updatedUser.current_weight!,
+                updatedUser.goal_weight!,
+                weightDiff
+              )
+            : ONBOARDING_MESSAGES.COMPLETED_WITHOUT_GOAL(
+                updatedUser.first_name,
+                updatedUser.current_weight!,
+                updatedUser.goal_weight!
+              );
+
+          await ctx.reply(
+            `${ONBOARDING_MESSAGES.TIMEZONE_DETECTED(text)}\n\n${completionMessage}`,
+            { reply_markup: menuButtons }
+          );
+        }
+      } else {
+        await ctx.reply(ONBOARDING_MESSAGES.INVALID_TIMEZONE, {
+          reply_markup: manualTimezoneKeyboard,
+        });
+      }
+      return;
+    }
+
+    // Handle numeric onboarding steps (weight, goal, height)
     const validation = validateNumber(text);
 
     if (!validation.valid) {
@@ -115,25 +164,11 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
         }
         const updatedUser = await updateUser(telegramId, {
           height: num,
-          onboarding_step: "completed",
+          onboarding_step: "timezone",
         });
 
         if (updatedUser) {
-          const weightDiff = (updatedUser.current_weight ?? 0) - (updatedUser.goal_weight ?? 0);
-          const message = weightDiff > 0
-            ? ONBOARDING_MESSAGES.COMPLETED_WITH_GOAL(
-                updatedUser.first_name,
-                updatedUser.current_weight!,
-                updatedUser.goal_weight!,
-                weightDiff
-              )
-            : ONBOARDING_MESSAGES.COMPLETED_WITHOUT_GOAL(
-                updatedUser.first_name,
-                updatedUser.current_weight!,
-                updatedUser.goal_weight!
-              );
-
-          await ctx.reply(message, { reply_markup: menuButtons });
+          await sendOnboardingPrompt(ctx, updatedUser);
         }
         break;
       }

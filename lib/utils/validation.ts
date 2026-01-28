@@ -50,9 +50,18 @@ export function validateHeight(height: number): { valid: boolean; error?: string
   return { valid: true };
 }
 
-export function getMealTypeByTime(date: Date = new Date()): MealType {
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+export function getMealTypeByTime(timezone: string = "UTC"): MealType {
+  // Get current time in user's timezone using Intl.DateTimeFormat
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(now);
+  const hours = parseInt(parts.find(p => p.type === "hour")?.value || "0");
+  const minutes = parseInt(parts.find(p => p.type === "minute")?.value || "0");
   const timeInMinutes = hours * 60 + minutes;
 
   // Convert time ranges to minutes for easier comparison

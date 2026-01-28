@@ -6,7 +6,8 @@ export interface User {
   current_weight: number | null;
   goal_weight: number | null;
   height: number | null;
-  onboarding_step: "weight" | "goal" | "height" | "completed";
+  timezone: string;
+  onboarding_step: "weight" | "goal" | "height" | "timezone" | "completed";
   created_at: string;
   updated_at: string;
 }

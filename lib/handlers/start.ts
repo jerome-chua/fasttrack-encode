@@ -1,7 +1,7 @@
 import { Context } from "grammy";
 import { getUser, createUser } from "../supabase";
 import { User } from "../types";
-import { menuButtons } from "../constants/keyboards";
+import { menuButtons, locationRequestKeyboard } from "../constants/keyboards";
 import { START_MESSAGES, ONBOARDING_MESSAGES } from "../constants/messages";
 import { handleError } from "../utils/error-handler";
 
@@ -26,6 +26,12 @@ export async function sendOnboardingPrompt(ctx: Context, user: User): Promise<vo
       await ctx.reply(
         ONBOARDING_MESSAGES.HEIGHT,
         { reply_markup: { remove_keyboard: true } }
+      );
+      break;
+    case "timezone":
+      await ctx.reply(
+        ONBOARDING_MESSAGES.TIMEZONE,
+        { reply_markup: locationRequestKeyboard }
       );
       break;
     case "completed":

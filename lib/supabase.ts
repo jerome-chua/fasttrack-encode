@@ -54,7 +54,7 @@ export async function createUser(telegramId: number, firstName: string): Promise
 
 export async function updateUser(
   telegramId: number,
-  updates: Partial<Pick<User, "current_weight" | "goal_weight" | "height" | "onboarding_step">>
+  updates: Partial<Pick<User, "current_weight" | "goal_weight" | "height" | "timezone" | "onboarding_step">>
 ): Promise<User | null> {
   const { data, error } = await supabase
     .from("users")

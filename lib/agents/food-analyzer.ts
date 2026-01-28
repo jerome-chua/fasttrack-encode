@@ -1,6 +1,6 @@
 import { FunctionTool, LlmAgent } from "@google/adk";
 import { z } from "zod";
-import { createFoodLog } from "../supabase";
+import { createFoodLog, getUser } from "../supabase";
 import { FoodItem } from "../types";
 import { getMealTypeByTime } from "../utils/validation";
 
@@ -23,7 +23,9 @@ const logFoodToDatabase = new FunctionTool({
     notes: z.string().describe("Brief notes about the meal, tips, or observations"),
   }),
   execute: async ({ telegram_id, calories, protein, carbs, fat, food_items, notes }) => {
-    const meal_type = getMealTypeByTime();
+    // Fetch user to get their timezone
+    const user = await getUser(telegram_id);
+    const meal_type = getMealTypeByTime(user?.timezone || "UTC");
 
     const foodLog = await createFoodLog({
       telegram_id,

@@ -4,6 +4,10 @@ export const ONBOARDING_MESSAGES = {
     `Hi ${firstName}! Welcome to FastTrack, where we'll hit your weight goals together using principles from The Obesity Code by Dr. Jason Fung.\n\nLet's get you set up! First, what's your current weight in kg?\n\n(Just type a number, e.g., 75)`,
   GOAL: "Great! Now, what's your goal weight in kg?\n\n(Just type a number, e.g., 68)",
   HEIGHT: "Almost done! What's your height in cm?\n\n(Just type a number, e.g., 170)",
+  TIMEZONE: "Last step! I need your timezone to track meals correctly.\n\nTap the button below to share your location (I'll only use it to detect your timezone), or enter manually.",
+  TIMEZONE_MANUAL: "Please select your timezone or type it (e.g., Asia/Singapore):",
+  TIMEZONE_DETECTED: (tz: string) => `Detected timezone: ${tz}`,
+  INVALID_TIMEZONE: "I couldn't recognize that timezone. Please select from the options or type a valid timezone like 'Asia/Singapore'.",
   COMPLETED: "You're all set! Choose an option below to get started:",
   COMPLETED_WITH_GOAL: (firstName: string, currentWeight: number, goalWeight: number, weightDiff: number) =>
     `You're all set, ${firstName}!\n\nCurrent: ${currentWeight} kg\nGoal: ${goalWeight} kg\nTo lose: ${weightDiff.toFixed(1)} kg\n\nLet's make it happen! Choose an option below:`,
