@@ -1,8 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navigation() {
+  const { user, isLoading } = useAuth({ required: false });
+
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -31,14 +34,16 @@ export default function Navigation() {
         >
           About
         </motion.a>
-        <motion.a
-          href="/start"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="rounded-lg bg-fasttrack-ocean px-4 py-2 font-medium text-white transition-colors hover:bg-fasttrack-azure"
-        >
-          Start Tracking
-        </motion.a>
+        {!isLoading && (
+          <motion.a
+            href={user ? "/dashboard" : "/start"}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="rounded-lg bg-fasttrack-ocean px-4 py-2 font-medium text-white transition-colors hover:bg-fasttrack-azure"
+          >
+            {user ? "Dashboard" : "Start Tracking"}
+          </motion.a>
+        )}
       </div>
     </motion.nav>
   );

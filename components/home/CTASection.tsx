@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp, scaleIn } from "./animations";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CTASection() {
+  const { user, isLoading } = useAuth({ required: false });
+
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -50,16 +53,18 @@ export default function CTASection() {
             Join thousands of users who are unlocking their potential every
             day.
           </motion.p>
-          <motion.div variants={scaleIn}>
-            <motion.a
-              href="/start"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-block rounded-lg bg-fasttrack-ocean px-8 py-4 text-lg font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fasttrack-azure"
-            >
-              START TRACKING
-            </motion.a>
-          </motion.div>
+          {!isLoading && (
+            <motion.div variants={scaleIn}>
+              <motion.a
+                href={user ? "/dashboard" : "/start"}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-block rounded-lg bg-fasttrack-ocean px-8 py-4 text-lg font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fasttrack-azure"
+              >
+                {user ? "GO TO DASHBOARD" : "START TRACKING"}
+              </motion.a>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </motion.section>
