@@ -4,6 +4,8 @@ import { User } from "../types";
 import { menuButtons, locationRequestKeyboard } from "../constants/keyboards";
 import { START_MESSAGES, ONBOARDING_MESSAGES } from "../constants/messages";
 import { handleError } from "../utils/error-handler";
+import { isLoginCode } from "../utils/validation";
+import { handleLoginCode } from "./login";
 
 // Send the appropriate onboarding prompt based on user's step
 export async function sendOnboardingPrompt(ctx: Context, user: User): Promise<void> {
@@ -54,6 +56,17 @@ export async function handleStartCommand(ctx: Context): Promise<void> {
   }
 
   try {
+    // Check if this is a deep link with a login code (e.g., /start ABC12345)
+    const messageText = ctx.message?.text || "";
+    const parts = messageText.split(" ");
+    if (parts.length > 1) {
+      const potentialCode = parts[1].trim();
+      if (isLoginCode(potentialCode)) {
+        await handleLoginCode(ctx, potentialCode);
+        return;
+      }
+    }
+
     // Check if user exists
     let user = await getUser(telegramId);
 

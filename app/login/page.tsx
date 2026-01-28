@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
 import { Copy, Check } from 'lucide-react'
+import QRCode from 'react-qr-code'
 
 type LoginState = 'loading' | 'code' | 'waiting' | 'success' | 'expired' | 'error'
 
@@ -172,6 +173,26 @@ export default function LoginPage() {
             {/* Code Display */}
             {(state === 'code' || state === 'waiting') && code && (
               <div className="flex flex-col items-center gap-6">
+                {/* QR Code */}
+                <div className="rounded-xl bg-white p-4 shadow-sm border border-fasttrack-mist">
+                  <QRCode
+                    value={`https://t.me/FastTrackOcBot?start=${code}`}
+                    size={180}
+                    level="M"
+                    fgColor="#1e3a5f"
+                  />
+                </div>
+                <p className="text-sm text-fasttrack-ocean/70">
+                  Scan with your phone camera to open Telegram
+                </p>
+
+                {/* Divider */}
+                <div className="flex w-full items-center gap-4">
+                  <div className="h-px flex-1 bg-fasttrack-ocean/20" />
+                  <span className="text-sm text-fasttrack-ocean/50">or copy code</span>
+                  <div className="h-px flex-1 bg-fasttrack-ocean/20" />
+                </div>
+
                 {/* Code Box */}
                 <div className="relative w-full rounded-xl bg-fasttrack-mist p-6 text-center">
                   <button
@@ -198,7 +219,7 @@ export default function LoginPage() {
 
                 {/* Open Telegram Button */}
                 <a
-                  href="https://t.me/FastTrackOcBot"
+                  href={`https://t.me/FastTrackOcBot?start=${code}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-fasttrack-ocean px-6 py-3 font-medium text-white transition-colors hover:bg-fasttrack-azure"

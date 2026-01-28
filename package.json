@@ -45,6 +45,7 @@
     "opik": "^1.9.87",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-qr-code": "^2.0.18",
     "zod": "^3.25.76"
   },
   "devDependencies": {
