@@ -1,4 +1,4 @@
-import { Variants } from "framer-motion";
+import { Variants, TargetAndTransition } from "framer-motion";
 
 export const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -55,11 +55,11 @@ export const slideInRight: Variants = {
   },
 };
 
-export const floatingAnimation = {
+export const floatingAnimation: TargetAndTransition = {
   y: [-8, 8, -8],
   transition: {
     duration: 4,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
   },
 };
