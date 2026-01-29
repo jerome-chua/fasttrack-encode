@@ -4,7 +4,6 @@ import { menuButtons } from "../constants/keyboards";
 import { FOOD_LOGGING_MESSAGES } from "../constants/messages";
 import { getLargestPhoto, downloadPhotoFromTelegram } from "../utils/photo-processing";
 import { analyzeFoodPhoto } from "../services/food-analyzer";
-import { handleError } from "../utils/error-handler";
 
 // Handle photo messages (food logging)
 export async function handlePhotoMessage(
