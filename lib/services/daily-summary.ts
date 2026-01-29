@@ -1,50 +1,18 @@
-import { InMemoryRunner } from "@google/adk";
-import { DAILY_SUMMARY_AGENT_NAME, dailySummaryAgent } from "../agents/daily-summary-agent";
+import { dailySummaryAgent } from "../mastra/agents/daily-summary-agent";
 
 const DAILY_SUMMARY_TIMEOUT_MS = 30000; // 30 seconds
 
 async function generateDailySummaryInternal(telegramId: number): Promise<string> {
-  const APP_NAME = "dailySummaryGenerator";
-  const runner = new InMemoryRunner({
-    agent: dailySummaryAgent,
-    appName: APP_NAME,
-  });
+  console.log("🤖 Starting Mastra daily summary agent...");
 
-  const userId = telegramId.toString();
-  const session = await runner.sessionService.createSession({
-    appName: APP_NAME,
-    userId,
-  });
-
-  const newMessage = {
-    role: "user" as const,
-    parts: [
-      {
-        text: `Generate today's daily summary for telegram_id: ${telegramId}. Use the tools to gather their data.`,
-      },
-    ],
-  };
-
-  let agentResponse = "";
-  for await (const event of runner.runAsync({
-    userId,
-    sessionId: session.id,
-    newMessage,
-  })) {
-    const isAgentResponse = event.author === DAILY_SUMMARY_AGENT_NAME;
-    const contentParts = event.content?.parts;
-
-    if (isAgentResponse && contentParts) {
-      agentResponse = "";
-      for (const part of contentParts) {
-        if ("text" in part && part.text) {
-          agentResponse += part.text;
-        }
-      }
+  const response = await dailySummaryAgent.generate(
+    `Generate today's daily summary for telegram_id: ${telegramId}. Use the tools to gather their data.`,
+    {
+      maxSteps: 5,
     }
-  }
+  );
 
-  return agentResponse;
+  return response.text || "Unable to generate daily summary at this time.";
 }
 
 export async function generateDailySummary(telegramId: number): Promise<string> {

@@ -1,49 +1,18 @@
-import { InMemoryRunner } from "@google/adk";
-import { INSIGHTS_AGENT_NAME, insightsAgent } from "../agents/insights-agent";
+import { insightsAgent } from "../mastra/agents/insights-agent";
 
 const INSIGHTS_TIMEOUT_MS = 45000; // 45 seconds
 
 async function generateInsightsInternal(telegramId: number): Promise<string> {
-  const APP_NAME = "insightsGenerator"
-  const runner = new InMemoryRunner({
-    agent: insightsAgent,
-    appName: APP_NAME,
-  });
+  console.log("🤖 Starting Mastra insights agent...");
 
-  const userId = telegramId.toString();
-  const session = await runner.sessionService.createSession({
-    appName: APP_NAME,
-    userId,
-  });
-
-  const newMessage = {
-    role: "user" as const,
-    parts: [
-      {
-        text: `Generate personalized health insights for telegram_id: ${telegramId}. Use all available tools to gather their data, then provide comprehensive insights.`,
-      },
-    ],
-  };
-
-  let agentResponse = "";
-  for await (const event of runner.runAsync({
-    userId,
-    sessionId: session.id,
-    newMessage,
-  })) {
-    const isAgentResponse = event.author === INSIGHTS_AGENT_NAME;
-    const contentParts = event.content?.parts;
-
-    if (isAgentResponse && contentParts) {
-      agentResponse = "";
-      for (const part of contentParts) {
-        if ("text" in part && part.text) {
-          agentResponse += part.text;
-        }
-      }
+  const response = await insightsAgent.generate(
+    `Generate personalized health insights for telegram_id: ${telegramId}. Use all available tools to gather their data, then provide comprehensive insights.`,
+    {
+      maxSteps: 10,
     }
-  }
-  return agentResponse;
+  );
+
+  return response.text || "Unable to generate insights at this time.";
 }
 
 export async function generateInsights(telegramId: number): Promise<string> {
