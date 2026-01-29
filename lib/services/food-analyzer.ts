@@ -14,7 +14,8 @@ export async function analyzeFoodPhoto(
         content: [
           {
             type: "image",
-            image: `data:${mimeType};base64,${imageBase64}`,
+            image: imageBase64,
+            mimeType: mimeType,
           },
           {
             type: "text",
