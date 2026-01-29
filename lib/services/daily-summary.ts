@@ -5,14 +5,20 @@ const DAILY_SUMMARY_TIMEOUT_MS = 30000; // 30 seconds
 async function generateDailySummaryInternal(telegramId: number): Promise<string> {
   console.log("🤖 Starting Mastra daily summary agent...");
 
-  const response = await dailySummaryAgent.generate(
-    `Generate today's daily summary for telegram_id: ${telegramId}. Use the tools to gather their data.`,
-    {
-      maxSteps: 5,
-    }
-  );
+  try {
+    const response = await dailySummaryAgent.generate(
+      `Generate today's daily summary for telegram_id: ${telegramId}. Use the tools to gather their data.`,
+      {
+        maxSteps: 5,
+      }
+    );
 
-  return response.text || "Unable to generate daily summary at this time.";
+    console.log("✅ Daily summary response:", response.text?.substring(0, 100));
+    return response.text || "Unable to generate daily summary at this time.";
+  } catch (error) {
+    console.error("❌ Daily summary agent error:", error);
+    throw error;
+  }
 }
 
 export async function generateDailySummary(telegramId: number): Promise<string> {
