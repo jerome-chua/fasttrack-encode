@@ -6,28 +6,36 @@ export async function analyzeFoodPhoto(
   telegramId: number
 ): Promise<string> {
   console.log("🤖 Starting Mastra food analyzer agent...");
+  console.log("📷 Image mimeType:", mimeType);
+  console.log("📷 Image base64 length:", imageBase64.length);
 
-  const response = await foodAnalyzerAgent.generate(
-    [
+  try {
+    const response = await foodAnalyzerAgent.generate(
+      [
+        {
+          role: "user",
+          content: [
+            {
+              type: "image",
+              image: `data:${mimeType};base64,${imageBase64}`,
+              mimeType: mimeType,
+            },
+            {
+              type: "text",
+              text: `Analyze this food photo and log it for telegram_id: ${telegramId}`,
+            },
+          ],
+        },
+      ],
       {
-        role: "user",
-        content: [
-          {
-            type: "image",
-            image: imageBase64,
-            mimeType: mimeType,
-          },
-          {
-            type: "text",
-            text: `Analyze this food photo and log it for telegram_id: ${telegramId}`,
-          },
-        ],
-      },
-    ],
-    {
-      maxSteps: 5,
-    }
-  );
+        maxSteps: 5,
+      }
+    );
 
-  return response.text || "Unable to analyze the food photo.";
+    console.log("✅ Agent response received:", response.text?.substring(0, 100));
+    return response.text || "Unable to analyze the food photo.";
+  } catch (error) {
+    console.error("❌ Food analyzer error:", error);
+    throw error;
+  }
 }
