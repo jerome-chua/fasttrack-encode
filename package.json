@@ -40,6 +40,7 @@
     "framer-motion": "^12.29.2",
     "geo-tz": "^8.1.5",
     "grammy": "^1.39.3",
+    "langfuse-vercel": "^3.38.6",
     "lucide-react": "^0.563.0",
     "motion-dom": "^12.29.2",
     "motion-utils": "^12.29.2",
