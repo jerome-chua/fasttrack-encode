@@ -1,10 +1,11 @@
-import { insightsAgent } from "../mastra/agents/insights-agent";
+import { mastra } from "../mastra";
 
 const INSIGHTS_TIMEOUT_MS = 45000; // 45 seconds
 
 async function generateInsightsInternal(telegramId: number): Promise<string> {
   try {
-    const response = await insightsAgent.generate(
+    const agent = mastra.getAgent("insightsAgent");
+    const response = await agent.generate(
       `Generate personalized health insights for telegram_id: ${telegramId}. Use all available tools to gather their data, then provide comprehensive insights.`,
       {
         maxSteps: 10,

@@ -1,4 +1,4 @@
-import { foodAnalyzerAgent } from "../mastra/agents/food-analyzer";
+import { mastra } from "../mastra";
 
 export async function analyzeFoodPhoto(
   imageBase64: string,
@@ -10,7 +10,8 @@ export async function analyzeFoodPhoto(
   console.log("📷 Image base64 length:", imageBase64.length);
 
   try {
-    const response = await foodAnalyzerAgent.generate(
+    const agent = mastra.getAgent("foodAnalyzerAgent");
+    const response = await agent.generate(
       [
         {
           role: "user",

@@ -1,4 +1,4 @@
-import { dailySummaryAgent } from "../mastra/agents/daily-summary-agent";
+import { mastra } from "../mastra";
 
 const DAILY_SUMMARY_TIMEOUT_MS = 30000; // 30 seconds
 
@@ -6,7 +6,8 @@ async function generateDailySummaryInternal(telegramId: number): Promise<string>
   console.log("🤖 Starting Mastra daily summary agent...");
 
   try {
-    const response = await dailySummaryAgent.generate(
+    const agent = mastra.getAgent("dailySummaryAgent");
+    const response = await agent.generate(
       `Generate today's daily summary for telegram_id: ${telegramId}. Use the tools to gather their data.`,
       {
         maxSteps: 5,
