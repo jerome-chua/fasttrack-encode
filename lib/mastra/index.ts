@@ -9,7 +9,7 @@ import { questionsAgent } from "./agents/questions-agent";
 
 const opikApiKey = process.env.OPIK_API_KEY;
 const opikWorkspace = process.env.OPIK_WORKSPACE || "default";
-const opikEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
+const opikEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "https://www.comet.com/opik/api/v1/private/otel";
 
 // === OPIK CONFIGURATION LOGS ===
 console.log("📊 [Opik] Initializing observability...");
