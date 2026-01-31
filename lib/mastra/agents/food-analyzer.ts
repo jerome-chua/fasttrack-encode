@@ -18,22 +18,36 @@ const groqProvider = createGroq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+// Schema for food items - handles both array and stringified JSON from LLM
+const foodItemSchema = z.object({
+  name: z.string().describe("Name of the food item"),
+  calories: z.coerce.number().describe("Calories for this item"),
+  portion: z.string().describe("Portion size description"),
+});
+
+// Transform that handles stringified JSON arrays from LLMs
+const foodItemsTransform = z.union([
+  z.array(foodItemSchema),
+  z.string().transform((str) => {
+    try {
+      const parsed = JSON.parse(str);
+      return z.array(foodItemSchema).parse(parsed);
+    } catch {
+      return [];
+    }
+  }),
+]);
+
 const logFoodToDatabaseTool = createTool({
   id: "log_food_to_database",
-  description: "Logs the analyzed food data to the database after analyzing a meal photo.",
+  description: "Logs the analyzed food data to the database after analyzing a meal photo. IMPORTANT: All numeric values must be numbers, not strings. food_items must be a JSON array.",
   inputSchema: z.object({
-    telegram_id: z.number().describe("The Telegram user ID"),
-    calories: z.number().describe("Total estimated calories for the meal"),
-    protein: z.number().describe("Estimated protein in grams"),
-    carbs: z.number().describe("Estimated carbohydrates in grams"),
-    fat: z.number().describe("Estimated fat in grams"),
-    food_items: z.array(
-      z.object({
-        name: z.string().describe("Name of the food item"),
-        calories: z.number().describe("Calories for this item"),
-        portion: z.string().describe("Portion size description"),
-      })
-    ).describe("List of identified food items"),
+    telegram_id: z.coerce.number().describe("The Telegram user ID (number)"),
+    calories: z.coerce.number().describe("Total estimated calories for the meal (number)"),
+    protein: z.coerce.number().describe("Estimated protein in grams (number)"),
+    carbs: z.coerce.number().describe("Estimated carbohydrates in grams (number)"),
+    fat: z.coerce.number().describe("Estimated fat in grams (number)"),
+    food_items: foodItemsTransform.describe("List of identified food items as JSON array"),
     notes: z.string().describe("Brief notes about the meal, tips, or observations"),
   }),
   execute: async (input) => {
