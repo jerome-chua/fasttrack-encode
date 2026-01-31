@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.16",
+    "@ai-sdk/groq": "^3.0.19",
     "@google-cloud/opentelemetry-cloud-monitoring-exporter": "^0.21.0",
     "@google-cloud/opentelemetry-cloud-trace-exporter": "^3.0.0",
     "@google-cloud/storage": "^7.18.0",

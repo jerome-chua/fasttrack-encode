@@ -2,14 +2,21 @@
  * Food Analyzer Agent - Mastra Implementation
  *
  * Analyzes food photos and estimates nutritional content.
+ * Uses Llama 4 Scout via Groq for free, fast vision analysis.
  */
 
 import { Agent } from "@mastra/core/agent";
 import { createTool } from "@mastra/core/tools";
+import { createGroq } from "@ai-sdk/groq";
 import { z } from "zod";
 import { createFoodLog, getUser } from "../../supabase";
 import { FoodItem } from "../../types";
 import { getMealTypeByTime } from "../../utils/validation";
+
+const GROQ_MODEL = process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
+const groqProvider = createGroq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 const logFoodToDatabaseTool = createTool({
   id: "log_food_to_database",
@@ -32,7 +39,6 @@ const logFoodToDatabaseTool = createTool({
   execute: async (input) => {
     const { telegram_id, calories, protein, carbs, fat, food_items, notes } = input;
 
-    // Fetch user to get their timezone
     const user = await getUser(telegram_id);
     const meal_type = getMealTypeByTime(user?.timezone || "UTC");
 
@@ -66,7 +72,7 @@ export const FOOD_ANALYZER_AGENT_NAME = "food_analyzer_agent";
 export const foodAnalyzerAgent = new Agent({
   id: FOOD_ANALYZER_AGENT_NAME,
   name: "Food Analyzer",
-  model: "google/gemini-2.5-flash",
+  model: groqProvider(GROQ_MODEL),
   instructions: `You are a nutrition expert that analyzes food photos.
 
 When given a food photo:
