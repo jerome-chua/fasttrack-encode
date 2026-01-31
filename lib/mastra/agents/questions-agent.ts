@@ -3,12 +3,21 @@
  *
  * Routes questions to specialized agents or answers general nutrition/fasting questions directly.
  * This is the orchestrator agent that decides which specialized agent to delegate to.
+ * Uses Llama 3.3 70B via Groq for free, fast text generation.
  */
 
 import { Agent } from "@mastra/core/agent";
 import { createTool } from "@mastra/core/tools";
+import { createGroq } from "@ai-sdk/groq";
 import { z } from "zod";
 import { getUser } from "../../supabase";
+
+// Configure Groq provider
+const GROQ_TEXT_MODEL = process.env.GROQ_TEXT_MODEL || "llama-3.3-70b-versatile";
+
+const groqProvider = createGroq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 // These will call the service functions that use the other agents
 // Import lazily to avoid circular dependencies
@@ -132,7 +141,7 @@ export const QUESTIONS_AGENT_NAME = "questions_agent";
 export const questionsAgent = new Agent({
   id: QUESTIONS_AGENT_NAME,
   name: "Q&A Assistant",
-  model: "google/gemini-2.5-flash",
+  model: groqProvider(GROQ_TEXT_MODEL),
   instructions: QUESTIONS_AGENT_INSTRUCTION,
   tools: {
     getInsightsFromAgent: getInsightsFromAgentTool,

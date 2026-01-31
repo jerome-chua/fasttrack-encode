@@ -2,12 +2,21 @@
  * Daily Summary Agent - Mastra Implementation
  *
  * Generates daily nutrition summaries based on today's food logs.
+ * Uses Llama 3.3 70B via Groq for free, fast text generation.
  */
 
 import { Agent } from "@mastra/core/agent";
 import { createTool } from "@mastra/core/tools";
+import { createGroq } from "@ai-sdk/groq";
 import { z } from "zod";
 import { getUser, getFoodLogsForDate } from "../../supabase";
+
+// Configure Groq provider
+const GROQ_TEXT_MODEL = process.env.GROQ_TEXT_MODEL || "llama-3.3-70b-versatile";
+
+const groqProvider = createGroq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 const getUserProfileTool = createTool({
   id: "get_user_profile",
@@ -126,7 +135,7 @@ export const DAILY_SUMMARY_AGENT_NAME = "daily_summary_agent";
 export const dailySummaryAgent = new Agent({
   id: DAILY_SUMMARY_AGENT_NAME,
   name: "Daily Summary",
-  model: "google/gemini-2.5-flash",
+  model: groqProvider(GROQ_TEXT_MODEL),
   instructions: DAILY_SUMMARY_INSTRUCTION,
   tools: {
     getUserProfile: getUserProfileTool,
