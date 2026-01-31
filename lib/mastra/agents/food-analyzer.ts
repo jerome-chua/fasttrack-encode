@@ -18,40 +18,70 @@ const groqProvider = createGroq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-// Schema for food items - handles both array and stringified JSON from LLM
+// Helper: Accept both number and string at JSON Schema level for Groq compatibility
+// Llama 4 Scout outputs strings instead of numbers for tool parameters
+const flexibleNumber = z.union([z.number(), z.string()]).describe("number");
+
+// Schema for food items - accepts string calories for LLM compatibility
 const foodItemSchema = z.object({
-  name: z.string().describe("Name of the food item"),
-  calories: z.coerce.number().describe("Calories for this item"),
-  portion: z.string().describe("Portion size description"),
+  name: z.string(),
+  calories: z.union([z.number(), z.string()]),
+  portion: z.string(),
 });
 
-// Transform that handles stringified JSON arrays from LLMs
-const foodItemsTransform = z.union([
+// Accept both array and stringified JSON array
+const flexibleFoodItems = z.union([
   z.array(foodItemSchema),
-  z.string().transform((str) => {
+  z.string(),
+]);
+
+// Helper to parse food items (handles stringified JSON)
+function parseFoodItems(items: unknown): FoodItem[] {
+  if (typeof items === "string") {
     try {
-      const parsed = JSON.parse(str);
-      return z.array(foodItemSchema).parse(parsed);
+      const parsed = JSON.parse(items);
+      if (Array.isArray(parsed)) {
+        return parsed.map((item: { name?: string; calories?: string | number; portion?: string }) => ({
+          name: String(item.name || ""),
+          calories: Number(item.calories) || 0,
+          portion: String(item.portion || ""),
+        }));
+      }
     } catch {
       return [];
     }
-  }),
-]);
+  }
+  if (Array.isArray(items)) {
+    return items.map((item: { name?: string; calories?: string | number; portion?: string }) => ({
+      name: String(item.name || ""),
+      calories: Number(item.calories) || 0,
+      portion: String(item.portion || ""),
+    }));
+  }
+  return [];
+}
 
 const logFoodToDatabaseTool = createTool({
   id: "log_food_to_database",
-  description: "Logs the analyzed food data to the database after analyzing a meal photo. IMPORTANT: All numeric values must be numbers, not strings. food_items must be a JSON array.",
+  description: "Logs the analyzed food data to the database after analyzing a meal photo.",
   inputSchema: z.object({
-    telegram_id: z.coerce.number().describe("The Telegram user ID (number)"),
-    calories: z.coerce.number().describe("Total estimated calories for the meal (number)"),
-    protein: z.coerce.number().describe("Estimated protein in grams (number)"),
-    carbs: z.coerce.number().describe("Estimated carbohydrates in grams (number)"),
-    fat: z.coerce.number().describe("Estimated fat in grams (number)"),
-    food_items: foodItemsTransform.describe("List of identified food items as JSON array"),
-    notes: z.string().describe("Brief notes about the meal, tips, or observations"),
+    telegram_id: flexibleNumber.describe("The Telegram user ID"),
+    calories: flexibleNumber.describe("Total estimated calories for the meal"),
+    protein: flexibleNumber.describe("Estimated protein in grams"),
+    carbs: flexibleNumber.describe("Estimated carbohydrates in grams"),
+    fat: flexibleNumber.describe("Estimated fat in grams"),
+    food_items: flexibleFoodItems.describe("Array of food items with name, calories, and portion"),
+    notes: z.string().describe("Brief notes about the meal"),
   }),
   execute: async (input) => {
-    const { telegram_id, calories, protein, carbs, fat, food_items, notes } = input;
+    // Convert string inputs to numbers (Llama 4 Scout outputs strings)
+    const telegram_id = Number(input.telegram_id);
+    const calories = Number(input.calories);
+    const protein = Number(input.protein);
+    const carbs = Number(input.carbs);
+    const fat = Number(input.fat);
+    const food_items = parseFoodItems(input.food_items);
+    const notes = input.notes;
 
     const user = await getUser(telegram_id);
     const meal_type = getMealTypeByTime(user?.timezone || "UTC");
